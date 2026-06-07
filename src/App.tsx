@@ -20,24 +20,35 @@ export default function App() {
   const [showPopup, setShowPopup] = useState(false);
 
   useEffect(() => {
+    let timeoutId: number;
+    
+    // Throttled scroll handler for better mobile performance
     const handleScroll = () => {
-      const sections = ['home', 'about', 'skills', 'projects', 'contact'];
-      const scrollPosition = window.scrollY + window.innerHeight / 3;
+      if (timeoutId) return;
+      
+      timeoutId = window.setTimeout(() => {
+        const sections = ['home', 'about', 'skills', 'projects', 'contact'];
+        const scrollPosition = window.scrollY + window.innerHeight / 3;
 
-      for (const section of sections) {
-        const element = document.getElementById(section);
-        if (element) {
-          const { offsetTop, offsetHeight } = element;
-          if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
-            setActiveSection(section);
-            break;
+        for (const section of sections) {
+          const element = document.getElementById(section);
+          if (element) {
+            const { offsetTop, offsetHeight } = element;
+            if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
+              setActiveSection(section);
+              break;
+            }
           }
         }
-      }
+        timeoutId = 0;
+      }, 50);
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, []);
 
   const scrollToSection = (id: string) => {
@@ -97,7 +108,7 @@ export default function App() {
   ];
 
   return (
-    <div className="bg-zinc-950 text-zinc-100 min-h-screen">
+    <div className="bg-zinc-950 text-zinc-100 min-h-[100dvh]">
       {/* Navigation */}
       <motion.nav
         initial={{ y: -100 }}
@@ -188,17 +199,17 @@ export default function App() {
       </motion.nav>
 
       {/* Hero Section */}
-      <section id="home" className="min-h-screen flex items-center justify-center relative overflow-hidden pt-20">
-        <div className="absolute inset-0 overflow-hidden">
+      <section id="home" className="min-h-[100dvh] flex items-center justify-center relative overflow-hidden pt-20">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <motion.div
             animate={{ scale: [1, 1.2, 1], rotate: [0, 180, 360] }}
             transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-            className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-br from-violet-600/20 to-fuchsia-600/20 rounded-full blur-3xl"
+            className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-br from-violet-600/20 to-fuchsia-600/20 rounded-full blur-3xl will-change-transform"
           />
           <motion.div
             animate={{ scale: [1.2, 1, 1.2], rotate: [360, 180, 0] }}
             transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
-            className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-gradient-to-tl from-blue-600/20 to-cyan-600/20 rounded-full blur-3xl"
+            className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-gradient-to-tl from-blue-600/20 to-cyan-600/20 rounded-full blur-3xl will-change-transform"
           />
         </div>
 
@@ -222,12 +233,12 @@ export default function App() {
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-                className="absolute -inset-4 bg-gradient-to-r from-violet-600 via-fuchsia-600 to-cyan-600 rounded-full blur-xl opacity-75"
+                className="absolute -inset-4 bg-gradient-to-r from-violet-600 via-fuchsia-600 to-cyan-600 rounded-full blur-xl opacity-75 will-change-transform"
               />
               <motion.div
                 animate={{ rotate: -360 }}
                 transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
-                className="absolute -inset-2 bg-gradient-to-r from-cyan-600 via-violet-600 to-fuchsia-600 rounded-full opacity-50"
+                className="absolute -inset-2 bg-gradient-to-r from-cyan-600 via-violet-600 to-fuchsia-600 rounded-full opacity-50 will-change-transform"
               />
               <motion.div
                 whileHover={{ scale: 1.05 }}
@@ -246,7 +257,7 @@ export default function App() {
               <motion.div
                 animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.2, 0.5] }}
                 transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute inset-0 rounded-full border-2 border-violet-400/50"
+                className="absolute inset-0 rounded-full border-2 border-violet-400/50 will-change-transform"
               />
             </motion.div>
           </motion.div>
@@ -351,7 +362,7 @@ export default function App() {
       </section>
 
       {/* About Section */}
-      <section id="about" className="min-h-screen flex items-center py-20 px-6">
+      <section id="about" className="min-h-[100dvh] flex items-center py-20 px-6">
         <div className="container mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
@@ -379,12 +390,12 @@ export default function App() {
                 transition={{ duration: 0.3 }}
               >
                 <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-violet-600 via-fuchsia-600 to-cyan-600 rounded-2xl blur-2xl opacity-30"
+                  className="absolute inset-0 bg-gradient-to-r from-violet-600 via-fuchsia-600 to-cyan-600 rounded-2xl blur-2xl opacity-30 will-change-transform"
                   animate={{ opacity: [0.3, 0.5, 0.3] }}
                   transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
                 />
                 <motion.div
-                  className="absolute -inset-1 bg-gradient-to-r from-violet-600 via-fuchsia-600 to-cyan-600 rounded-2xl opacity-0 group-hover:opacity-100 blur-sm"
+                  className="absolute -inset-1 bg-gradient-to-r from-violet-600 via-fuchsia-600 to-cyan-600 rounded-2xl opacity-0 group-hover:opacity-100 blur-sm will-change-transform"
                   animate={{ rotate: [0, 360] }}
                   transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
                 />
@@ -441,7 +452,7 @@ export default function App() {
       </section>
 
       {/* Skills Section */}
-      <section id="skills" className="min-h-screen flex items-center py-20 px-6 bg-zinc-900/50">
+      <section id="skills" className="min-h-[100dvh] flex items-center py-20 px-6 bg-zinc-900/50">
         <div className="container mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
@@ -508,7 +519,7 @@ export default function App() {
       </section>
 
       {/* Projects Section */}
-      <section id="projects" className="min-h-screen flex items-center py-20 px-6">
+      <section id="projects" className="min-h-[100dvh] flex items-center py-20 px-6">
         <div className="container mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
@@ -608,7 +619,7 @@ export default function App() {
       </section>
 
       {/* Contact Section */}
-      <section id="contact" className="min-h-screen flex items-center py-20 px-6 bg-zinc-900/50">
+      <section id="contact" className="min-h-[100dvh] flex items-center py-20 px-6 bg-zinc-900/50">
         <div className="container mx-auto max-w-4xl">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
